@@ -1277,18 +1277,24 @@
 
 .card-meta {
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
   font-size: 0.85rem;
 }
 
 .card-id {
   color: #9ca3af;
   font-weight: 500;
+  text-align: left;
+  flex: 1;
 }
 
 .card-links {
   color: var(--primary-color, #2563EB);
   font-weight: 600;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 /* Ações do cartão */
@@ -1751,6 +1757,10 @@
   
   .cards-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .card-meta {
+    flex-wrap: nowrap;
   }
   
   .card-preview {
