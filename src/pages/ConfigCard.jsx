@@ -189,7 +189,8 @@ const ConfigCard = () => {
       const cardData = {
         ...formData,
         cardId,
-        isConfigured: true
+        isConfigured: true,
+        createdAt: isEditing ? formData.createdAt : new Date().toISOString()
       };
       
       // Salvar no Firestore
@@ -198,7 +199,7 @@ const ConfigCard = () => {
       // Também salvar no localStorage como backup
       localStorage.setItem(`card_${cardId}`, JSON.stringify({
         ...cardData,
-        createdAt: new Date().toISOString()
+        createdAt: cardData.createdAt
       }));
       
       if (isEditing) {
@@ -211,7 +212,16 @@ const ConfigCard = () => {
       
     } catch (error) {
       console.error('Erro ao salvar configuração:', error);
-      alert('Erro ao salvar configuração. Tente novamente.');
+      
+      // Mostrar mensagem de erro mais específica
+      if (error.message && error.message.includes('Limite de 3 cartões')) {
+        alert('Limite de 3 cartões por conta atingido. Exclua um cartão existente para criar um novo.');
+      } else if (error.message && error.message.includes('Permissão negada')) {
+        alert('Erro de permissão. Faça login novamente.');
+        navigate('/login');
+      } else {
+        alert(`Erro ao salvar configuração: ${error.message || 'Erro desconhecido'}. Tente novamente.`);
+      }
     } finally {
       setIsLoading(false);
     }

@@ -47,15 +47,23 @@ export const cardService = {
   // Salvar/Atualizar cartão
   async saveCard(userId, cardId, cardData) {
     try {
-      // Verificar se é uma criação de novo cartão
-      const isNewCard = !cardData.createdAt;
+      console.log('Salvando cartão:', { userId, cardId, isEditing: !!cardData.createdAt });
+      
+      // Verificar se é uma criação de novo cartão (não tem createdAt ou createdAt é string recente)
+      const isNewCard = !cardData.createdAt || 
+        (typeof cardData.createdAt === 'string' && 
+         new Date(cardData.createdAt) > new Date(Date.now() - 60000)); // Criado há menos de 1 minuto
       
       if (isNewCard) {
+        console.log('Verificando limite para novo cartão...');
         // Verificar limite antes de criar novo cartão
         const canCreate = await this.canCreateCard(userId);
         if (!canCreate) {
           throw new Error('Limite de 3 cartões por conta atingido. Exclua um cartão existente para criar um novo.');
         }
+        console.log('Limite OK, pode criar novo cartão');
+      } else {
+        console.log('Atualizando cartão existente');
       }
 
       const cardRef = doc(db, CARDS_COLLECTION, `${userId}_${cardId}`);
@@ -68,12 +76,15 @@ export const cardService = {
         createdAt: cardData.createdAt || serverTimestamp()
       };
 
+      console.log('Dados a serem salvos:', dataToSave);
       await setDoc(cardRef, dataToSave, { merge: true });
       
-      console.log('Cartão salvo no Firestore:', cardId);
+      console.log('Cartão salvo no Firestore com sucesso:', cardId);
       return { success: true };
     } catch (error) {
-      console.error('Erro ao salvar cartão:', error);
+      console.error('Erro detalhado ao salvar cartão:', error);
+      console.error('Código do erro:', error.code);
+      console.error('Mensagem do erro:', error.message);
       throw new Error(error.message || 'Erro ao salvar cartão no banco de dados');
     }
   },
