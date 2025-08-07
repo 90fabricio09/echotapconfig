@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NFCInstructions from '../components/NFCInstructions';
 import { useAuth } from '../contexts/AuthContext';
 import { cardService } from '../services/cardService';
+import logoImage from '../assets/images/logo.png';
+import echoTapImage from '../assets/images/echotap.png';
 
 const CardManager = () => {
   const [cards, setCards] = useState([]);
@@ -11,6 +13,7 @@ const CardManager = () => {
   const [showNFCInstructions, setShowNFCInstructions] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState(null);
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (currentUser) {
@@ -125,7 +128,7 @@ const CardManager = () => {
       }
       
       const newCardId = cardService.generateCardId();
-      window.open(`/config/${newCardId}`, '_blank');
+      navigate(`/config/${newCardId}`);
     } catch (error) {
       console.error('Erro ao verificar limite:', error);
       alert('Erro ao verificar limite de cartões. Tente novamente.');
@@ -168,11 +171,11 @@ const CardManager = () => {
         {/* Logo no topo */}
         <div className="top-logo-section">
           <img 
-            src="/src/assets/images/logo.png" 
+            src={logoImage} 
             alt="EchoTap Logo" 
             className="top-logo"
             onError={(e) => {
-              e.target.src = '/src/assets/images/echotap.png';
+              e.target.src = echoTapImage;
             }}
           />
         </div>
@@ -324,7 +327,10 @@ const CardManager = () => {
                       <Link 
                         to={`/card/${card.id}`} 
                         className="action-btn view-btn"
-                        target="_blank"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/card/${card.id}`);
+                        }}
                       >
                         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                           <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
@@ -335,7 +341,10 @@ const CardManager = () => {
                       <Link 
                         to={`/config/${card.id}`} 
                         className="action-btn edit-btn"
-                        target="_blank"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/config/${card.id}`);
+                        }}
                       >
                         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
