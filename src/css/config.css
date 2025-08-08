@@ -1,83 +1,3 @@
-/* Reset global para corrigir espaçamentos no mobile */
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: auto;
-  overflow-x: hidden;
-}
-
-/* DEBUG: Cores de fundo para identificar espaços */
-@media (max-width: 768px) {
-  html {
-    background-color: rgba(255, 0, 0, 0.1) !important;
-    height: auto !important;
-  }
-  
-  body {
-    background-color: rgba(0, 255, 0, 0.1) !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
-    position: relative !important;
-  }
-  
-  /* Força o body a se adaptar ao conteúdo */
-  body::after {
-    content: '';
-    display: block;
-    height: 0;
-    clear: both;
-  }
-  
-  #root {
-    background-color: rgba(255, 165, 0, 0.1) !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
-    position: relative !important;
-  }
-  
-  .manager-container {
-    background-color: rgba(128, 0, 128, 0.1) !important;
-  }
-  
-  .manager-wrapper {
-    background-color: rgba(255, 255, 0, 0.1) !important;
-  }
-  
-  .manager-content {
-    background-color: rgba(0, 255, 255, 0.1) !important;
-  }
-  
-  .empty-state {
-    background-color: rgba(255, 0, 255, 0.1) !important;
-  }
-}
-
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-/* Corrige problemas de viewport no mobile */
-@supports (-webkit-touch-callout: none) {
-  html {
-    height: auto;
-  }
-  
-  body {
-    min-height: auto;
-    height: auto !important;
-    max-height: none !important;
-  }
-}
-
 /* Estilos para a página de configuração - Design Profissional */
 .config-container {
   min-height: 100vh;
@@ -1825,10 +1745,10 @@ html, body {
 
 /* Estilos para o gerenciador de cartões - Design Profissional */
 .manager-container {
+  min-height: 100vh;
   background: #f8fafc;
   padding: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  min-height: auto;
 }
 
 /* Logo no topo */
@@ -2668,40 +2588,8 @@ html, body {
 
 /* Responsividade do gerenciador */
 @media (max-width: 768px) {
-  /* DEBUG: Bordas coloridas para identificar elementos */
-  * {
-    border: 1px solid red !important;
-  }
-  
-  html {
-    border: 2px solid blue !important;
-  }
-  
-  body {
-    border: 2px solid green !important;
-  }
-  
-  #root {
-    border: 2px solid orange !important;
-  }
-  
   .manager-container {
-    border: 3px solid purple !important;
-    padding: 12px;
-    margin: 0;
-    min-height: auto;
-  }
-  
-  .manager-wrapper {
-    border: 3px solid yellow !important;
-  }
-  
-  .manager-content {
-    border: 3px solid cyan !important;
-  }
-  
-  .empty-state {
-    border: 3px solid magenta !important;
+    padding: 16px;
   }
   
   .top-logo-section {
@@ -2761,11 +2649,7 @@ html, body {
   }
   
   .manager-content {
-    padding: 16px;
-  }
-  
-  .empty-state {
-    padding: 20px 16px;
+    padding: 20px;
   }
   
   .cards-grid {
@@ -2916,6 +2800,7 @@ html, body {
   .desktop-instruction ul {
     gap: 6px;
   }
+}
 
 /* Seção NFC destacada no card - Design limpo */
 .card-nfc-section {
