@@ -654,6 +654,9 @@ html, body {
   z-index: 10002;
   backdrop-filter: blur(4px);
   padding: 20px;
+  /* iOS Safari fix - prevent body scroll */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .confirm-modal {
@@ -987,6 +990,9 @@ html, body {
   justify-content: center;
   z-index: 9999;
   backdrop-filter: blur(2px);
+  /* iOS Safari fix - prevent body scroll */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .image-loading-modal {
@@ -2318,6 +2324,9 @@ html, body {
   justify-content: center;
   z-index: 10000;
   padding: 20px;
+  /* iOS Safari fix - prevent body scroll */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nfc-instructions-modal {
@@ -2885,6 +2894,9 @@ html, body {
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  /* iOS Safari fix - prevent body scroll */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nfc-modal {
@@ -3571,5 +3583,29 @@ html, body {
   
   .back-to-home-btn span {
     display: none;
+  }
+}
+
+/* iOS Safari fixes for modals */
+@supports (-webkit-touch-callout: none) {
+  /* Prevent body scroll when modals are open */
+  .confirm-modal-overlay,
+  .nfc-modal-overlay,
+  .nfc-instructions-overlay,
+  .image-loading-overlay,
+  .crop-modal-overlay {
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure modals don't cause viewport issues */
+  .confirm-modal,
+  .nfc-modal,
+  .nfc-instructions-modal,
+  .image-loading-modal,
+  .crop-modal {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 } 

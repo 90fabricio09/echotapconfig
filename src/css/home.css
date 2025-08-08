@@ -851,4 +851,20 @@
     left: 10px;
     max-width: none;
   }
+}
+
+/* iOS Safari fixes for modals */
+@supports (-webkit-touch-callout: none) {
+  /* Prevent body scroll when modals are open */
+  .confirm-modal-overlay {
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure modals don't cause viewport issues */
+  .confirm-modal {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 } 
