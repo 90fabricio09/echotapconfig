@@ -158,7 +158,7 @@ const ConfigCard = () => {
 
   const iconOptions = [
     { value: 'bi-globe', label: 'Website' },
-    { value: 'bi-whatsapp', label: 'WhatsApp' },
+    { value: 'bi-chat-dots', label: 'Chat/Bate-papo' },
     { value: 'bi-instagram', label: 'Instagram' },
     { value: 'bi-linkedin', label: 'LinkedIn' },
     { value: 'bi-github', label: 'GitHub' },

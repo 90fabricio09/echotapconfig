@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -115,6 +115,12 @@ const Login = () => {
     return (
       <div className="auth-container">
         <div className="auth-wrapper">
+          <Link to="/" className="back-to-home-btn">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Voltar ao Início</span>
+          </Link>
           <div className="auth-header">
             <h1>
               <svg className="auth-icon" viewBox="0 0 24 24" width="24" height="24">
@@ -204,6 +210,12 @@ const Login = () => {
     return (
       <div className="auth-container">
         <div className="auth-wrapper">
+          <Link to="/" className="back-to-home-btn">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Voltar ao Início</span>
+          </Link>
           <div className="auth-header">
             <h1>
               <svg className="auth-icon" viewBox="0 0 24 24" width="24" height="24">
@@ -296,6 +308,12 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-wrapper">
+        <Link to="/" className="back-to-home-btn">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+          <span>Voltar ao Início</span>
+        </Link>
         <div className="auth-header">
           <h1>
             <svg className="auth-icon" viewBox="0 0 24 24" width="24" height="24">
@@ -308,9 +326,6 @@ const Login = () => {
 
         {error && (
           <div className="auth-error">
-            <svg className="error-icon" viewBox="0 0 24 24" width="18" height="18">
-              <path fill="#DC2626" d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
-            </svg>
             {error}
           </div>
         )}

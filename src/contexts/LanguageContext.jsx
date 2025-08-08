@@ -61,8 +61,10 @@ export const LanguageProvider = ({ children }) => {
     pt: {
       title: 'EchoTap',
       bio: 'Clique nos botões para interagir',
-      config: '🚀 Sistema de Configuração',
+      config: 'Sistema de Configuração',
       configDesc: 'Configure seu próprio cartão NFC',
+      support: 'Suporte',
+      supportDesc: 'Atendimento via WhatsApp',
       website: 'Website',
       websiteDesc: 'Acesse o site',
       instagram: 'Instagram',
@@ -112,6 +114,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Click the buttons to interact',
       config: '🚀 Configuration System',
       configDesc: 'Configure your own NFC card',
+      support: 'Support',
+      supportDesc: 'WhatsApp customer service',
       website: 'Website',
       websiteDesc: 'Visit the website',
       instagram: 'Instagram',
@@ -161,6 +165,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Haz clic en los botones para interactuar',
       config: '🚀 Sistema de Configuración',
       configDesc: 'Configura tu propia tarjeta NFC',
+      support: 'Soporte',
+      supportDesc: 'Atención por WhatsApp',
       website: 'Sitio Web',
       websiteDesc: 'Visita el sitio',
       instagram: 'Instagram',
@@ -210,6 +216,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Cliquez sur les boutons pour interagir',
       config: '🚀 Système de Configuration',
       configDesc: 'Configurez votre propre carte NFC',
+      support: 'Support',
+      supportDesc: 'Service client WhatsApp',
       website: 'Site Web',
       websiteDesc: 'Visitez le site',
       instagram: 'Instagram',
@@ -259,6 +267,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Klicken Sie auf die Schaltflächen, um zu interagieren',
       config: '🚀 Konfigurationssystem',
       configDesc: 'Konfigurieren Sie Ihre eigene NFC-Karte',
+      support: 'Support',
+      supportDesc: 'WhatsApp Kundendienst',
       website: 'Webseite',
       websiteDesc: 'Besuchen Sie die Website',
       instagram: 'Instagram',
@@ -308,6 +318,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Clicca sui pulsanti per interagire',
       config: '🚀 Sistema di Configurazione',
       configDesc: 'Configura la tua carta NFC',
+      support: 'Supporto',
+      supportDesc: 'Assistenza WhatsApp',
       website: 'Sito Web',
       websiteDesc: 'Visita il sito',
       instagram: 'Instagram',
@@ -357,6 +369,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'ボタンをクリックして操作',
       config: '🚀 設定システム',
       configDesc: '独自のNFCカードを設定',
+      support: 'サポート',
+      supportDesc: 'WhatsAppカスタマーサービス',
       website: 'ウェブサイト',
       websiteDesc: 'サイトを訪問',
       instagram: 'Instagram',
@@ -406,6 +420,8 @@ export const LanguageProvider = ({ children }) => {
       bio: '点击按钮进行交互',
       config: '🚀 配置系统',
       configDesc: '配置您自己的NFC卡',
+      support: '支持',
+      supportDesc: 'WhatsApp客服',
       website: '网站',
       websiteDesc: '访问网站',
       instagram: 'Instagram',
@@ -455,6 +471,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'Нажмите на кнопки для взаимодействия',
       config: '🚀 Система Конфигурации',
       configDesc: 'Настройте свою NFC-карту',
+      support: 'Поддержка',
+      supportDesc: 'Служба поддержки WhatsApp',
       website: 'Веб-сайт',
       websiteDesc: 'Посетите сайт',
       instagram: 'Instagram',
@@ -504,6 +522,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'انقر على الأزرار للتفاعل',
       config: '🚀 نظام التكوين',
       configDesc: 'قم بتكوين بطاقة NFC الخاصة بك',
+      support: 'الدعم',
+      supportDesc: 'خدمة عملاء واتساب',
       website: 'الموقع الإلكتروني',
       websiteDesc: 'زيارة الموقع',
       instagram: 'Instagram',
@@ -553,6 +573,8 @@ export const LanguageProvider = ({ children }) => {
       bio: 'इंटरैक्ट करने के लिए बटन पर क्लिक करें',
       config: '🚀 कॉन्फ़िगरेशन सिस्टम',
       configDesc: 'अपना NFC कार्ड कॉन्फ़िगर करें',
+      support: 'सहायता',
+      supportDesc: 'WhatsApp ग्राहक सेवा',
       website: 'वेबसाइट',
       websiteDesc: 'वेबसाइट देखें',
       instagram: 'Instagram',
@@ -602,6 +624,8 @@ export const LanguageProvider = ({ children }) => {
       bio: '버튼을 클릭하여 상호작용',
       config: '🚀 구성 시스템',
       configDesc: '자신만의 NFC 카드 구성',
+      support: '지원',
+      supportDesc: 'WhatsApp 고객 서비스',
       website: '웹사이트',
       websiteDesc: '웹사이트 방문',
       instagram: 'Instagram',

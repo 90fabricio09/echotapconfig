@@ -17,25 +17,9 @@ const Home = () => {
       isExternal: false
     },
     {
-      title: translations.website,
-      description: translations.websiteDesc,
-      icon: "bi-globe",
-      path: "https://echotap.com.br",
-      color: primaryColor,
-      isExternal: true
-    },
-    {
-      title: translations.instagram,
-      description: translations.instagramDesc,
-      icon: "bi-instagram",
-      path: "https://instagram.com/echotapoficial",
-      color: primaryColor,
-      isExternal: true
-    },
-    {
-      title: translations.whatsapp,
-      description: translations.whatsappDesc,
-      icon: "bi-whatsapp",
+      title: translations.support,
+      description: translations.supportDesc,
+      icon: "bi-chat-dots",
       path: "https://wa.me/5511994921448",
       color: primaryColor,
       isExternal: true
