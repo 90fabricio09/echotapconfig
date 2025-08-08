@@ -1745,7 +1745,6 @@
 
 /* Estilos para o gerenciador de cartões - Design Profissional */
 .manager-container {
-  min-height: 100vh;
   background: #f8fafc;
   padding: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -2589,7 +2588,7 @@
 /* Responsividade do gerenciador */
 @media (max-width: 768px) {
   .manager-container {
-    padding: 16px;
+    padding: 12px;
   }
   
   .top-logo-section {
@@ -2649,7 +2648,11 @@
   }
   
   .manager-content {
-    padding: 20px;
+    padding: 16px;
+  }
+  
+  .empty-state {
+    padding: 20px 16px;
   }
   
   .cards-grid {
@@ -2800,7 +2803,6 @@
   .desktop-instruction ul {
     gap: 6px;
   }
-}
 
 /* Seção NFC destacada no card - Design limpo */
 .card-nfc-section {

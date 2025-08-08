@@ -19,7 +19,7 @@ const Home = () => {
     {
       title: translations.support,
       description: translations.supportDesc,
-      icon: "bi-chat-dots",
+      icon: "bi-whatsapp",
       path: "https://wa.me/5511994921448",
       color: primaryColor,
       isExternal: true
