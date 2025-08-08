@@ -7,6 +7,7 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: auto;
   overflow-x: hidden;
 }
 
@@ -14,14 +15,20 @@ html, body {
 @media (max-width: 768px) {
   html {
     background-color: rgba(255, 0, 0, 0.1) !important;
+    height: auto !important;
   }
   
   body {
     background-color: rgba(0, 255, 0, 0.1) !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
   }
   
   #root {
     background-color: rgba(255, 165, 0, 0.1) !important;
+    height: auto !important;
+    min-height: auto !important;
   }
   
   .manager-container {
