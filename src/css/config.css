@@ -23,12 +23,23 @@ html, body {
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
+    position: relative !important;
+  }
+  
+  /* Força o body a se adaptar ao conteúdo */
+  body::after {
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
   }
   
   #root {
     background-color: rgba(255, 165, 0, 0.1) !important;
     height: auto !important;
     min-height: auto !important;
+    max-height: none !important;
+    position: relative !important;
   }
   
   .manager-container {
@@ -62,6 +73,8 @@ html, body {
   
   body {
     min-height: auto;
+    height: auto !important;
+    max-height: none !important;
   }
 }
 
