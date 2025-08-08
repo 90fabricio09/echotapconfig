@@ -12,8 +12,90 @@ const CardManager = () => {
   const [canCreateCard, setCanCreateCard] = useState(true);
   const [showNFCInstructions, setShowNFCInstructions] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    onConfirm: null,
+    onCancel: null,
+    confirmText: 'Confirmar',
+    cancelText: 'Cancelar'
+  });
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Sistema de notificações
+  const showNotification = (message, type = 'info', duration = 4000, cardId = null) => {
+    const id = Date.now() + Math.random();
+    const notification = { id, message, type, duration, cardId };
+    setNotifications(prev => [...prev, notification]);
+
+    // Auto remover após duration
+    setTimeout(() => {
+      removeNotification(id);
+    }, duration);
+  };
+
+  const removeNotification = (id) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  // Função para renderizar mensagem da notificação com ID em negrito
+  const renderNotificationMessage = (notification) => {
+    if (notification.cardId && notification.message.includes(notification.cardId)) {
+      const parts = notification.message.split(notification.cardId);
+      return (
+        <>
+          {parts[0]}
+          <strong>{notification.cardId}</strong>
+          {parts[1]}
+        </>
+      );
+    }
+    return notification.message;
+  };
+
+  // Sistema de modal de confirmação
+  const showConfirmModal = ({
+    title = 'Confirmar Ação',
+    message = 'Tem certeza que deseja continuar?',
+    type = 'warning',
+    onConfirm = () => {},
+    onCancel = () => {},
+    confirmText = 'Confirmar',
+    cancelText = 'Cancelar'
+  }) => {
+    setConfirmModal({
+      show: true,
+      title,
+      message,
+      type,
+      onConfirm,
+      onCancel,
+      confirmText,
+      cancelText
+    });
+  };
+
+  const hideConfirmModal = () => {
+    setConfirmModal(prev => ({ ...prev, show: false }));
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmModal.onConfirm) {
+      confirmModal.onConfirm();
+    }
+    hideConfirmModal();
+  };
+
+  const handleCancelAction = () => {
+    if (confirmModal.onCancel) {
+      confirmModal.onCancel();
+    }
+    hideConfirmModal();
+  };
 
   // Função para formatar datas de forma segura
   const formatCardDate = (dateValue) => {
@@ -147,29 +229,45 @@ const CardManager = () => {
     }
   };
 
-  const deleteCard = async (cardId) => {
-    if (window.confirm(`Tem certeza que deseja excluir o cartão ${cardId}?`)) {
-      try {
-        console.log('Tentando excluir cartão:', cardId, 'para usuário:', currentUser.uid);
-        
-        // Excluir do Firestore
-        await cardService.deleteCard(currentUser.uid, cardId);
-        
-        // Também remover do localStorage
-        localStorage.removeItem(`card_${cardId}`);
-        
-        console.log('Cartão excluído com sucesso:', cardId);
-        
-        // Recarregar lista
-        await loadCards();
-        
-        alert('Cartão excluído com sucesso!');
-      } catch (error) {
-        console.error('Erro detalhado ao excluir cartão:', error);
-        console.error('CardId:', cardId, 'UserId:', currentUser?.uid);
-        alert(`Erro ao excluir cartão: ${error.message || error}`);
-      }
-    }
+  const deleteCard = (cardId) => {
+    showConfirmModal({
+      title: 'Excluir Cartão', 
+      message: (
+        <>
+          Tem certeza que deseja excluir o cartão <strong>{cardId}</strong>? Esta ação não pode ser desfeita.
+        </>
+      ),
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          console.log('Tentando excluir cartão:', cardId, 'para usuário:', currentUser.uid);
+          
+          // Excluir do Firestore
+          await cardService.deleteCard(currentUser.uid, cardId);
+          
+          // Também remover do localStorage
+          localStorage.removeItem(`card_${cardId}`);
+          
+          console.log('Cartão excluído com sucesso:', cardId);
+          
+          // Recarregar lista
+          await loadCards();
+          
+          showNotification(
+            `Cartão ${cardId} excluído com sucesso!`, 
+            'success',
+            4000,
+            cardId
+          );
+        } catch (error) {
+          console.error('Erro detalhado ao excluir cartão:', error);
+          console.error('CardId:', cardId, 'UserId:', currentUser?.uid);
+          showNotification(`Erro ao excluir cartão: ${error.message || 'Erro desconhecido'}`, 'error', 6000);
+        }
+      },
+      confirmText: 'Excluir Cartão',
+      cancelText: 'Cancelar'
+    });
   };
 
   const openNFCInstructions = (cardId) => {
@@ -184,7 +282,7 @@ const CardManager = () => {
 
   const createNewCard = async () => {
     if (!canCreateCard) {
-      alert('Você atingiu o limite de 3 cartões por conta. Exclua um cartão existente para criar um novo.');
+      showNotification('Você atingiu o limite de 3 cartões por conta. Exclua um cartão existente para criar um novo.', 'warning', 5000);
       return;
     }
     
@@ -192,7 +290,7 @@ const CardManager = () => {
       // Verificar novamente se pode criar (para garantir)
       const canCreate = await cardService.canCreateCard(currentUser.uid);
       if (!canCreate) {
-        alert('Limite de 3 cartões por conta atingido. Exclua um cartão existente para criar um novo.');
+        showNotification('Limite de 3 cartões por conta atingido. Exclua um cartão existente para criar um novo.', 'warning', 5000);
         return;
       }
       
@@ -200,18 +298,26 @@ const CardManager = () => {
       navigate(`/config/${newCardId}`);
     } catch (error) {
       console.error('Erro ao verificar limite:', error);
-      alert('Erro ao verificar limite de cartões. Tente novamente.');
+      showNotification('Erro ao verificar limite de cartões. Tente novamente.', 'error');
     }
   };
 
-  const handleLogout = async () => {
-    if (window.confirm('Tem certeza que deseja sair?')) {
-      try {
-        await logout();
-      } catch (error) {
-        console.error('Erro ao fazer logout:', error);
-      }
-    }
+  const handleLogout = () => {
+    showConfirmModal({
+      title: 'Sair da Conta',
+      message: 'Tem certeza que deseja sair da sua conta?',
+      type: 'warning',
+      onConfirm: async () => {
+        try {
+          await logout();
+        } catch (error) {
+          console.error('Erro ao fazer logout:', error);
+          showNotification('Erro ao sair da conta. Tente novamente.', 'error');
+        }
+      },
+      confirmText: 'Sair',
+      cancelText: 'Cancelar'
+    });
   };
 
   const shareCard = async (cardId, cardName) => {
@@ -241,7 +347,7 @@ const CardManager = () => {
   const copyToClipboard = async (url, cardName) => {
     try {
       await navigator.clipboard.writeText(url);
-      alert(`Link do cartão "${cardName}" copiado para a área de transferência!`);
+      showNotification(`Link do cartão "${cardName}" copiado para a área de transferência!`, 'success');
     } catch (error) {
       console.error('Erro ao copiar para a área de transferência:', error);
       // Fallback final - mostrar o link para o usuário copiar manualmente
@@ -489,6 +595,100 @@ const CardManager = () => {
         </div>
       </div>
       
+      {/* Modal de Confirmação */}
+      {confirmModal.show && (
+        <div className="confirm-modal-overlay" onClick={(e) => e.target === e.currentTarget && handleCancelAction()}>
+          <div className="confirm-modal">
+            <div className="confirm-modal-header">
+              <div className={`confirm-icon confirm-icon-${confirmModal.type}`}>
+                {confirmModal.type === 'warning' && (
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+                  </svg>
+                )}
+                {confirmModal.type === 'danger' && (
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                  </svg>
+                )}
+                {confirmModal.type === 'info' && (
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                  </svg>
+                )}
+              </div>
+              <h3>{confirmModal.title}</h3>
+            </div>
+            
+            <div className="confirm-modal-content">
+              <p>{confirmModal.message}</p>
+            </div>
+            
+            <div className="confirm-modal-actions">
+              <button 
+                className="confirm-cancel-btn" 
+                onClick={handleCancelAction}
+              >
+                {confirmModal.cancelText}
+              </button>
+              <button 
+                className={`confirm-action-btn confirm-action-${confirmModal.type}`}
+                onClick={handleConfirmAction}
+              >
+                {confirmModal.confirmText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sistema de Notificações */}
+      {notifications.length > 0 && (
+        <div className="notifications-container">
+          {notifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={`notification notification-${notification.type}`}
+              onClick={() => removeNotification(notification.id)}
+            >
+              <div className="notification-icon">
+                {notification.type === 'success' && (
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                  </svg>
+                )}
+                {notification.type === 'error' && (
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                  </svg>
+                )}
+                {notification.type === 'warning' && (
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+                  </svg>
+                )}
+                {notification.type === 'info' && (
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                  </svg>
+                )}
+              </div>
+              <div className="notification-content">
+                <p>{renderNotificationMessage(notification)}</p>
+              </div>
+              <button className="notification-close" onClick={() => removeNotification(notification.id)}>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Modal de Instruções NFC */}
       {showNFCInstructions && selectedCardId && (
         <NFCInstructions 
