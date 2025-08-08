@@ -15,6 +15,51 @@ const CardManager = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Função para formatar datas de forma segura
+  const formatCardDate = (dateValue) => {
+    if (!dateValue) {
+      return 'Data não disponível';
+    }
+
+    try {
+      let date;
+      
+      // Se for um objeto Firestore Timestamp
+      if (dateValue && typeof dateValue.toDate === 'function') {
+        date = dateValue.toDate();
+      }
+      // Se for um objeto com propriedades seconds e nanoseconds (Firestore timestamp serializado)
+      else if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
+        date = new Date(dateValue.seconds * 1000);
+      }
+      // Se for uma string ISO
+      else if (typeof dateValue === 'string') {
+        date = new Date(dateValue);
+      }
+      // Se for um número (timestamp)
+      else if (typeof dateValue === 'number') {
+        date = new Date(dateValue);
+      }
+      // Se já for um objeto Date
+      else if (dateValue instanceof Date) {
+        date = dateValue;
+      }
+      else {
+        return 'Data inválida';
+      }
+
+      // Verificar se a data é válida
+      if (isNaN(date.getTime())) {
+        return 'Data inválida';
+      }
+
+      return date.toLocaleDateString('pt-BR');
+    } catch (error) {
+      console.error('Erro ao formatar data:', error, dateValue);
+      return 'Data inválida';
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
       loadCards();
@@ -67,7 +112,31 @@ const CardManager = () => {
           }
         }
         
-        allCards.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        allCards.sort((a, b) => {
+          // Função auxiliar para converter data para timestamp
+          const getTimestamp = (dateValue) => {
+            if (!dateValue) return 0;
+            
+            if (dateValue && typeof dateValue.toDate === 'function') {
+              return dateValue.toDate().getTime();
+            }
+            if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
+              return dateValue.seconds * 1000;
+            }
+            if (typeof dateValue === 'string') {
+              return new Date(dateValue).getTime();
+            }
+            if (typeof dateValue === 'number') {
+              return dateValue;
+            }
+            if (dateValue instanceof Date) {
+              return dateValue.getTime();
+            }
+            return 0;
+          };
+          
+          return getTimestamp(b.updatedAt || b.createdAt) - getTimestamp(a.updatedAt || a.createdAt);
+        });
         setCards(allCards);
         setCanCreateCard(allCards.length < 3);
       } catch (localError) {
@@ -142,6 +211,41 @@ const CardManager = () => {
       } catch (error) {
         console.error('Erro ao fazer logout:', error);
       }
+    }
+  };
+
+  const shareCard = async (cardId, cardName) => {
+    const cardUrl = `${window.location.origin}/card/${cardId}`;
+    
+    // Verificar se o navegador suporta Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Cartão NFC - ${cardName}`,
+          text: `Confira meu cartão de visita digital: ${cardName}`,
+          url: cardUrl
+        });
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Erro ao compartilhar:', error);
+          // Fallback para copiar link
+          copyToClipboard(cardUrl, cardName);
+        }
+      }
+    } else {
+      // Fallback para navegadores que não suportam Web Share API
+      copyToClipboard(cardUrl, cardName);
+    }
+  };
+
+  const copyToClipboard = async (url, cardName) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      alert(`Link do cartão "${cardName}" copiado para a área de transferência!`);
+    } catch (error) {
+      console.error('Erro ao copiar para a área de transferência:', error);
+      // Fallback final - mostrar o link para o usuário copiar manualmente
+      prompt('Copie o link do cartão:', url);
     }
   };
 
@@ -338,6 +442,16 @@ const CardManager = () => {
                         </svg>
                         Ver
                       </Link>
+                      <button 
+                        onClick={() => shareCard(card.id, card.name)}
+                        className="action-btn share-btn"
+                        title="Compartilhar cartão"
+                      >
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                        </svg>
+                        Compartilhar
+                      </button>
                       <Link 
                         to={`/config/${card.id}`} 
                         className="action-btn edit-btn"
@@ -364,8 +478,8 @@ const CardManager = () => {
                       </button>
                     </div>
                     
-                    <div className="card-created">
-                      Criado em: {new Date(card.createdAt).toLocaleDateString('pt-BR')}
+                    <div className="card-updated">
+                      Última edição: {formatCardDate(card.updatedAt || card.createdAt)}
                     </div>
                   </div>
                 ))}

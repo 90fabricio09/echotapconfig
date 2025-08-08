@@ -259,7 +259,7 @@ const ConfigCard = () => {
         ...formData,
         cardId,
         isConfigured: true,
-        createdAt: isEditing ? formData.createdAt : new Date().toISOString()
+        createdAt: isEditing && formData.createdAt ? formData.createdAt : new Date().toISOString()
       };
       
       // Salvar no Firestore
@@ -388,23 +388,9 @@ const ConfigCard = () => {
                 onChange={handleImageUpload}
                 disabled={isCompressingImage}
               />
-              {isCompressingImage && (
-                <div className="image-compressing">
-                  <div className="loading-spinner">
-                    <div className="spinner-ring">
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                    </div>
-                  </div>
-                  <p>Comprimindo imagem...</p>
-                </div>
-              )}
               {formData.profileImage && !isCompressingImage && (
                 <div className="image-preview">
                   <img src={formData.profileImage} alt="Preview" />
-                  <p className="image-info">Imagem otimizada para economizar espaço</p>
                 </div>
               )}
             </div>
@@ -616,6 +602,26 @@ const ConfigCard = () => {
           </div>
         </form>
       </div>
+      
+      {/* Modal de Carregamento de Imagem */}
+      {isCompressingImage && (
+        <div className="image-loading-overlay">
+          <div className="image-loading-modal">
+            <div className="image-loading-content">
+              <div className="image-loading-spinner">
+                <div className="spinner-ring">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+              </div>
+              <h3>Processando imagem</h3>
+              <p>Aguarde enquanto otimizamos sua foto...</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

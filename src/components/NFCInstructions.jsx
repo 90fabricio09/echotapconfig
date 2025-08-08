@@ -33,19 +33,21 @@ const NFCInstructions = ({ cardId, onClose }) => {
     return 'https://www.wakdev.com/en/apps/nfc-tools-pc-mac.html';
   };
 
-  // Copiar link do cartão
+  // Copiar link do cartão (sem protocolo para NFC Tools)
   const copyCardLink = async () => {
     const cardUrl = `${window.location.origin}/card/${cardId}`;
+    // Remove http:// ou https:// para evitar duplicação no NFC Tools
+    const linkForNFC = cardUrl.replace(/^https?:\/\//, '');
     
     try {
-      await navigator.clipboard.writeText(cardUrl);
+      await navigator.clipboard.writeText(linkForNFC);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Erro ao copiar link:', error);
       // Fallback para navegadores mais antigos
       const textArea = document.createElement('textarea');
-      textArea.value = cardUrl;
+      textArea.value = linkForNFC;
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
@@ -55,7 +57,7 @@ const NFCInstructions = ({ cardId, onClose }) => {
         setTimeout(() => setCopied(false), 2000);
       } catch (fallbackError) {
         console.error('Erro no fallback de cópia:', fallbackError);
-        alert(`Não foi possível copiar automaticamente. Copie manualmente: ${cardUrl}`);
+        alert(`Não foi possível copiar automaticamente. Copie manualmente: ${linkForNFC}`);
       }
       document.body.removeChild(textArea);
     }
@@ -63,9 +65,17 @@ const NFCInstructions = ({ cardId, onClose }) => {
 
   const platform = detectPlatform();
   const cardUrl = `${window.location.origin}/card/${cardId}`;
+  const displayUrl = cardUrl.replace(/^https?:\/\//, ''); // URL para exibição (sem protocolo)
+
+  // Fechar modal ao clicar no overlay (fora da caixa)
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   return (
-    <div className="nfc-instructions-overlay">
+    <div className="nfc-instructions-overlay" onClick={handleOverlayClick}>
       <div className="nfc-instructions-modal">
         {/* Botão de fechar */}
         <button className="close-btn" onClick={onClose} title="Fechar">
@@ -156,7 +166,7 @@ const NFCInstructions = ({ cardId, onClose }) => {
               <p>Este é o link que será gravado no seu cartão NFC</p>
               <div className="link-container">
                 <div className="link-display">
-                  <code>{cardUrl}</code>
+                  <code>{displayUrl}</code>
                 </div>
                 <button 
                   onClick={copyCardLink} 
@@ -196,14 +206,18 @@ const NFCInstructions = ({ cardId, onClose }) => {
                 </div>
                 <div className="substep">
                   <span className="substep-number">3.2</span>
-                  <span>Selecione <strong>"URL/URI"</strong></span>
+                  <span>Toque no botão <strong>"Adicionar para salvar"</strong> para adicionar um registro</span>
                 </div>
                 <div className="substep">
                   <span className="substep-number">3.3</span>
-                  <span>Cole o link copiado no campo de texto</span>
+                  <span>Selecione <strong>"URL/URI"</strong></span>
                 </div>
                 <div className="substep">
                   <span className="substep-number">3.4</span>
+                  <span>Cole o link copiado no campo de texto</span>
+                </div>
+                <div className="substep">
+                  <span className="substep-number">3.5</span>
                   <span>Toque em <strong>"Escrever"</strong> e aproxime o cartão</span>
                 </div>
               </div>
