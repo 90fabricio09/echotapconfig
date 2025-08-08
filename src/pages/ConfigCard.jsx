@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { cardService } from '../services/cardService';
@@ -153,26 +153,20 @@ const ConfigCard = () => {
       const img = new Image();
       
       img.onload = () => {
-        // Calcular dimensões mantendo proporção
-        let { width, height } = img;
+        // Fazer quadrado (recorte central)
+        const size = Math.min(img.width, img.height);
+        const offsetX = (img.width - size) / 2;
+        const offsetY = (img.height - size) / 2;
         
-        if (width > height) {
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxWidth) {
-            width = (width * maxWidth) / height;
-            height = maxWidth;
-          }
-        }
+        canvas.width = maxWidth;
+        canvas.height = maxWidth;
         
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Desenhar imagem redimensionada
-        ctx.drawImage(img, 0, 0, width, height);
+        // Desenhar imagem quadrada
+        ctx.drawImage(
+          img,
+          offsetX, offsetY, size, size, // source
+          0, 0, maxWidth, maxWidth // destination
+        );
         
         // Converter para base64 comprimido
         const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
@@ -189,22 +183,24 @@ const ConfigCard = () => {
       // Verificar se é uma imagem
       if (!file.type.startsWith('image/')) {
         alert('Por favor, selecione apenas arquivos de imagem.');
+        e.target.value = '';
         return;
       }
       
       // Verificar tamanho do arquivo (máximo 10MB antes da compressão)
       if (file.size > 10 * 1024 * 1024) {
         alert('Imagem muito grande. Por favor, selecione uma imagem menor que 10MB.');
+        e.target.value = '';
         return;
       }
       
       setIsCompressingImage(true);
       
       try {
-        // Comprimir a imagem
+        // Comprimir a imagem diretamente
         const compressedImage = await compressImage(file);
         
-        // Verificar se a imagem comprimida ainda está muito grande (máximo ~500KB em base64)
+        // Verificar se a imagem comprimida ainda está muito grande
         if (compressedImage.length > 700000) {
           // Comprimir mais
           const moreCompressed = await compressImage(file, 300, 0.6);
@@ -225,8 +221,13 @@ const ConfigCard = () => {
       } finally {
         setIsCompressingImage(false);
       }
+      
+      // Limpar input para permitir selecionar a mesma imagem novamente
+      e.target.value = '';
     }
   };
+
+
 
   const handleColorChange = (color) => {
     setFormData(prev => ({
@@ -240,7 +241,7 @@ const ConfigCard = () => {
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.bio || formData.links.some(link => !link.title || !link.path)) {
+    if (!formData.name || formData.links.some(link => !link.title || !link.path)) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
@@ -358,7 +359,7 @@ const ConfigCard = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="bio">Biografia *</label>
+              <label htmlFor="bio">Biografia</label>
               <textarea
                 id="bio"
                 name="bio"
@@ -366,24 +367,75 @@ const ConfigCard = () => {
                 onChange={handleInputChange}
                 placeholder="Conte um pouco sobre você ou sua empresa"
                 rows={3}
-                required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="profileImage">Foto de Perfil</label>
-              <input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={isCompressingImage}
-              />
-              {formData.profileImage && !isCompressingImage && (
-                <div className="image-preview">
-                  <img src={formData.profileImage} alt="Preview" />
-                </div>
-              )}
+              <label>Foto de Perfil</label>
+              <div className="image-upload-container">
+                {formData.profileImage && !isCompressingImage ? (
+                  <div className="image-preview-container">
+                    <div className="image-preview">
+                      <img src={formData.profileImage} alt="Preview" />
+                    </div>
+                    <div className="image-actions">
+                      <button
+                        type="button"
+                        className="change-image-btn"
+                        onClick={() => document.getElementById('profileImage').click()}
+                        disabled={isCompressingImage}
+                      >
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                        Alterar
+                      </button>
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={() => setFormData(prev => ({ ...prev, profileImage: '' }))}
+                        disabled={isCompressingImage}
+                      >
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                        </svg>
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="upload-placeholder">
+                    <button
+                      type="button"
+                      className="upload-btn"
+                      onClick={() => document.getElementById('profileImage').click()}
+                      disabled={isCompressingImage}
+                    >
+                      <div className="upload-icon">
+                        <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                          <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                        </svg>
+                      </div>
+                      <div className="upload-text">
+                        <span className="upload-title">Adicionar Foto</span>
+                        <span className="upload-subtitle">Clique para selecionar uma imagem</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+                
+                <input
+                  type="file"
+                  id="profileImage"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={isCompressingImage}
+                  style={{ display: 'none' }}
+                />
+              </div>
             </div>
           </div>
 
@@ -597,6 +649,8 @@ const ConfigCard = () => {
         </form>
       </div>
       
+
+
       {/* Modal de Carregamento de Imagem */}
       {isCompressingImage && (
         <div className="image-loading-overlay">
