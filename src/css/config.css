@@ -1,3 +1,33 @@
+/* Reset global para corrigir espaçamentos no mobile */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Corrige problemas de viewport no mobile */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
 /* Estilos para a página de configuração - Design Profissional */
 .config-container {
   min-height: 100vh;
@@ -2589,6 +2619,9 @@
 @media (max-width: 768px) {
   .manager-container {
     padding: 12px;
+    margin: 0;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
   }
   
   .top-logo-section {
