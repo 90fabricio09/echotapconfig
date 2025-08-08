@@ -10,6 +10,37 @@ html, body {
   overflow-x: hidden;
 }
 
+/* DEBUG: Cores de fundo para identificar espaços */
+@media (max-width: 768px) {
+  html {
+    background-color: rgba(255, 0, 0, 0.1) !important;
+  }
+  
+  body {
+    background-color: rgba(0, 255, 0, 0.1) !important;
+  }
+  
+  #root {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+  }
+  
+  .manager-container {
+    background-color: rgba(128, 0, 128, 0.1) !important;
+  }
+  
+  .manager-wrapper {
+    background-color: rgba(255, 255, 0, 0.1) !important;
+  }
+  
+  .manager-content {
+    background-color: rgba(0, 255, 255, 0.1) !important;
+  }
+  
+  .empty-state {
+    background-color: rgba(255, 0, 255, 0.1) !important;
+  }
+}
+
 #root {
   margin: 0;
   padding: 0;
@@ -2617,10 +2648,40 @@ html, body {
 
 /* Responsividade do gerenciador */
 @media (max-width: 768px) {
+  /* DEBUG: Bordas coloridas para identificar elementos */
+  * {
+    border: 1px solid red !important;
+  }
+  
+  html {
+    border: 2px solid blue !important;
+  }
+  
+  body {
+    border: 2px solid green !important;
+  }
+  
+  #root {
+    border: 2px solid orange !important;
+  }
+  
   .manager-container {
+    border: 3px solid purple !important;
     padding: 12px;
     margin: 0;
     min-height: auto;
+  }
+  
+  .manager-wrapper {
+    border: 3px solid yellow !important;
+  }
+  
+  .manager-content {
+    border: 3px solid cyan !important;
+  }
+  
+  .empty-state {
+    border: 3px solid magenta !important;
   }
   
   .top-logo-section {
