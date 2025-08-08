@@ -1,5 +1,7 @@
 .not-found-container {
-  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for iOS */
+  min-height: -webkit-fill-available; /* iOS Safari fallback */
+  min-height: 100vh; /* fallback for older browsers */
   display: flex;
   align-items: center;
   justify-content: center;

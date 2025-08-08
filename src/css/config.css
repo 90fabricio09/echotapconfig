@@ -1,9 +1,20 @@
+/* Estilos globais para iOS */
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 /* Estilos para a página de configuração - Design Profissional */
 .config-container {
-  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for iOS */
+  min-height: -webkit-fill-available; /* iOS Safari fallback */
+  min-height: 100vh; /* fallback for older browsers */
   background: #f8fafc;
   padding: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .config-wrapper {
@@ -1560,7 +1571,9 @@
 /* Estados de erro e loading - Design Profissional */
 .loading-container,
 .error-container {
-  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for iOS */
+  min-height: -webkit-fill-available; /* iOS Safari fallback */
+  min-height: 100vh; /* fallback for older browsers */
   background: #f8fafc;
   display: flex;
   align-items: center;
@@ -1745,6 +1758,9 @@
 
 /* Estilos para o gerenciador de cartões - Design Profissional */
 .manager-container {
+  min-height: 100dvh; /* dynamic viewport height for iOS */
+  min-height: -webkit-fill-available; /* iOS Safari fallback */
+  min-height: 100vh; /* fallback for older browsers */
   background: #f8fafc;
   padding: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -3083,7 +3099,9 @@
 
 /* Estilos para autenticação - Design Profissional Corporativo */
 .auth-container {
-  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for iOS */
+  min-height: -webkit-fill-available; /* iOS Safari fallback */
+  min-height: 100vh; /* fallback for older browsers */
   background: #f8fafc;
   display: flex;
   align-items: center;
